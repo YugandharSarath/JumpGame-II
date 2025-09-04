@@ -1,96 +1,120 @@
-import '@testing-library/jest-dom';
-const solveNQueens = require('./Queen');
+import "@testing-library/jest-dom";
+const totalNQueens = require("./Queen");
 
+describe("N-Queens II Problem", () => {
+  test("n = 1 should return 1 (single solution)", () => {
+    const result = totalNQueens(1);
+    expect(result).toBe(1);
+  });
 
-describe('N-Queens Problem', () => {
-    test('n = 1 should return single solution', () => {
-        const result = solveNQueens(1);
-        expect(result).toEqual([['Q']]);
-        expect(result).toHaveLength(1);
-    });
+  test("n = 2 should return 0 (no solution)", () => {
+    const result = totalNQueens(2);
+    expect(result).toBe(0);
+  });
 
-    test('n = 2 should return empty array (no solution)', () => {
-        const result = solveNQueens(2);
-        expect(result).toEqual([]);
-        expect(result).toHaveLength(0);
-    });
+  test("n = 3 should return 0 (no solution)", () => {
+    const result = totalNQueens(3);
+    expect(result).toBe(0);
+  });
 
-    test('n = 3 should return empty array (no solution)', () => {
-        const result = solveNQueens(3);
-        expect(result).toEqual([]);
-        expect(result).toHaveLength(0);
-    });
+  test("n = 4 should return 2 solutions", () => {
+    const result = totalNQueens(4);
+    expect(result).toBe(2);
+  });
 
-    test('n = 4 should return 2 solutions', () => {
-        const result = solveNQueens(4);
-        expect(result).toHaveLength(2);
+  test("n = 5 should return 10 solutions", () => {
+    const result = totalNQueens(5);
+    expect(result).toBe(10);
+  });
 
-        const expectedSolutions = [
-            ['.Q..', '...Q', 'Q...', '..Q.'],
-            ['..Q.', 'Q...', '...Q', '.Q..']
-        ];
+  test("n = 6 should return 4 solutions", () => {
+    const result = totalNQueens(6);
+    expect(result).toBe(4);
+  });
 
-        expect(result).toEqual(expect.arrayContaining(expectedSolutions));
-    });
+  test("n = 7 should return 40 solutions", () => {
+    const result = totalNQueens(7);
+    expect(result).toBe(40);
+  });
 
-    test('n = 5 should return 10 solutions', () => {
-        const result = solveNQueens(5);
-        expect(result).toHaveLength(10);
-    });
+  test("n = 8 should return 92 solutions", () => {
+    const result = totalNQueens(8);
+    expect(result).toBe(92);
+  });
 
-    test('n = 6 should return 4 solutions', () => {
-        const result = solveNQueens(6);
-        expect(result).toHaveLength(4);
-    });
+  test("n = 9 should return 352 solutions", () => {
+    const result = totalNQueens(9);
+    expect(result).toBe(352);
+  });
 
-    test('n = 8 should return 92 solutions', () => {
-        const result = solveNQueens(8);
-        expect(result).toHaveLength(92);
-    });
+  test("function should return a number", () => {
+    const result = totalNQueens(4);
+    expect(typeof result).toBe("number");
+    expect(Number.isInteger(result)).toBe(true);
+    expect(result).toBeGreaterThanOrEqual(0);
+  });
 
-    test('each solution should have correct format', () => {
-        const result = solveNQueens(4);
+  test("performance: n = 8 should complete within reasonable time", () => {
+    const start = performance.now();
+    const result = totalNQueens(8);
+    const end = performance.now();
 
-        result.forEach(solution => {
-            expect(solution).toHaveLength(4);
-            solution.forEach(row => {
-                expect(row).toHaveLength(4);
-                expect(row).toMatch(/^[Q.]{4}$/);
-                expect((row.match(/Q/g) || []).length).toBe(1);
-            });
-        });
-    });
+    expect(result).toBe(92);
+    expect(end - start).toBeLessThan(1000);
+  });
 
-    test('queens should not attack each other in valid solutions', () => {
-        const result = solveNQueens(4);
+  test("performance: n = 9 should complete within reasonable time", () => {
+    const start = performance.now();
+    const result = totalNQueens(9);
+    const end = performance.now();
 
-        result.forEach(solution => {
-            const queens = [];
+    expect(result).toBe(352);
+    expect(end - start).toBeLessThan(5000);
+  });
 
-            for (let i = 0; i < solution.length; i++) {
-                for (let j = 0; j < solution[i].length; j++) {
-                    if (solution[i][j] === 'Q') {
-                        queens.push([i, j]);
-                    }
-                }
-            }
+  test("edge case: maximum constraint n = 9", () => {
+    const result = totalNQueens(9);
+    expect(result).toBe(352);
+  });
 
-            for (let i = 0; i < queens.length; i++) {
-                for (let j = i + 1; j < queens.length; j++) {
-                    const [r1, c1] = queens[i];
-                    const [r2, c2] = queens[j];
+  test("consistency: multiple calls should return same result", () => {
+    const n = 6;
+    const result1 = totalNQueens(n);
+    const result2 = totalNQueens(n);
+    const result3 = totalNQueens(n);
 
-                    expect(r1).not.toBe(r2);
-                    expect(c1).not.toBe(c2);
+    expect(result1).toBe(result2);
+    expect(result2).toBe(result3);
+    expect(result1).toBe(4);
+  });
 
-                    expect(Math.abs(r1 - r2)).not.toBe(Math.abs(c1 - c2));
-                }
-            }
-        });
-    });
+  test("boundary values should work correctly", () => {
+    expect(totalNQueens(1)).toBe(1);
 
-    test('edge case: maximum constraint n = 9', () => {
-        const result = solveNQueens(9);
-        expect(result).toHaveLength(352);
-    });
+    expect(totalNQueens(9)).toBe(352);
+  });
+
+  test("known sequence validation", () => {
+    const expectedSequence = [1, 0, 0, 2, 10, 4, 40, 92, 352];
+
+    for (let n = 1; n <= 9; n++) {
+      expect(totalNQueens(n)).toBe(expectedSequence[n - 1]);
+    }
+  });
+
+  test("algorithm efficiency: should not return solutions array", () => {
+    const result = totalNQueens(4);
+    expect(Array.isArray(result)).toBe(false);
+    expect(typeof result).toBe("number");
+  });
+
+  test("verify algorithm correctness by checking smaller cases manually", () => {
+    expect(totalNQueens(1)).toBe(1);
+
+    expect(totalNQueens(2)).toBe(0);
+
+    expect(totalNQueens(3)).toBe(0);
+
+    expect(totalNQueens(4)).toBe(2);
+  });
 });

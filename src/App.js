@@ -1,5 +1,5 @@
-import { NQueensApp } from "./Queen";
+import { NQueens2App } from "./Queen";
 
 export default function App() {
-  return <NQueensApp />;
+  return <NQueens2App />;
 }

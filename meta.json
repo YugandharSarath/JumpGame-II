@@ -1,10 +1,31 @@
 {
-  "problem": "N-Queens",
+  "problem": "N-Queens II",
   "difficulty": "Hard",
   "category": "Backtracking",
-  "tags": ["Array", "Backtracking", "Recursion", "Chess"],
-  "companiesAsked": ["Amazon", "Adobe", "Apple", "Google", "Microsoft", "Facebook/Meta", "Uber"],
-  "expectedDuration": "45-70 minutes",
+  "tags": ["Backtracking", "Recursion", "Optimization", "Math"],
+  "companiesAsked": ["Amazon", "Adobe", "Apple", "Google", "Microsoft", "Facebook/Meta", "Uber", "ByteDance", "LinkedIn"],
+  "expectedDuration": "30-45 minutes",
   "timeComplexity": "O(N!)",
-  "spaceComplexity": "O(N²)"
+  "spaceComplexity": "O(N)",
+  "leetcodeNumber": 52,
+  "optimizations": [
+    "Set-based conflict detection",
+    "Bitwise operations",
+    "Memory-efficient counting",
+    "No solution storage required"
+  ],
+  "keyDifferences": {
+    "fromNQueensI": "Returns count instead of all solutions, more memory efficient"
+  },
+  "expectedCounts": {
+    "1": 1,
+    "2": 0,
+    "3": 0,
+    "4": 2,
+    "5": 10,
+    "6": 4,
+    "7": 40,
+    "8": 92,
+    "9": 352
+  }
 }
