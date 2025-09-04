@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>N-Queens Problem Solver</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .chess-square {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            border: 1px solid #333;
+        }
+        
+        .light-square {
+            background-color: #f0d9b5;
+        }
+        
+        .dark-square {
+            background-color: #b58863;
+        }
+        
+        .queen {
+            color: #333;
+        }
+        
+        .solution-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        
+        .board-container {
+            display: inline-block;
+            border: 3px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen py-8">
+        <div class="solution-container">
+            <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
+                N-Queens Problem Solver
+            </h1>
+            
+            <div class="text-center mb-6">
+                <p class="text-gray-600 mb-4">
+                    Place n queens on an n×n chessboard so that no two queens attack each other
+                </p>
+                
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <label for="n-input" class="font-semibold text-lg">Board Size (n):</label>
+                    <input
+                        id="n-input"
+                        data-testid="n-input"
+                        type="number"
+                        min="1"
+                        max="9"
+                        value="4"
+                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-24 text-center text-lg"
+                    />
+                    <button
+                        id="solve-button"
+                        data-testid="solve-button"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    >
+                        Solve
+                    </button>
+                </div>
+            </div>
+
+            <div id="results" class="text-center">
+                <p class="text-gray-500">Enter a board size and click "Solve" to see the solutions</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function solveNQueens(n) {
+            const result = [];
+            const board = Array(n).fill().map(() => Array(n).fill('.'));
+            
+            function isValid(row, col) {
+                // Check column
+                for (let i = 0; i < row; i++) {
+                    if (board[i][col] === 'Q') return false;
+                }
+                
+                // Check diagonal (top-left to bottom-right)
+                for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
+                    if (board[i][j] === 'Q') return false;
+                }
+                
+                // Check diagonal (top-right to bottom-left)
+                for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+                    if (board[i][j] === 'Q') return false;
+                }
+                
+                return true;
+            }
+            
+            function backtrack(row) {
+                if (row === n) {
+                    result.push(board.map(row => row.join('')));
+                    return;
+                }
+                
+                for (let col = 0; col < n; col++) {
+                    if (isValid(row, col)) {
+                        board[row][col] = 'Q';
+                        backtrack(row + 1);
+                        board[row][col] = '.';
+                    }
+                }
+            }
+            
+            backtrack(0);
+            return result;
+        }
+
+        function createChessBoard(solution) {
+            const boardDiv = document.createElement('div');
+            boardDiv.className = 'board-container';
+            boardDiv.setAttribute('data-testid', 'chess-board');
+            
+            solution.forEach((row, rowIndex) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.style.display = 'flex';
+                
+                row.split('').forEach((cell, colIndex) => {
+                    const square = document.createElement('div');
+                    square.className = `chess-square ${
+                        (rowIndex + colIndex) % 2 === 0 ? 'light-square' : 'dark-square'
+                    }`;
+                    
+                    if (cell === 'Q') {
+                        square.innerHTML = '♛';
+                        square.classList.add('queen');
+                    }
+                    
+                    rowDiv.appendChild(square);
+                });
+                
+                boardDiv.appendChild(rowDiv);
+            });
+            
+            return boardDiv;
+        }
+
+        let currentSolutions = [];
+        let currentSolutionIndex = 0;
+
+        function displaySolution(solutions, index) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (solutions.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="text-orange-600 py-4">
+                        <p>No solutions exist for this board size</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const solution = solutions[index];
+            
+            resultsDiv.innerHTML = `
+                <div class="mb-4">
+                    <p class="text-lg font-semibold mb-4" data-testid="solution-count">
+                        Found ${solutions.length} solution${solutions.length !== 1 ? 's' : ''}
+                    </p>
+                    
+                    ${solutions.length > 1 ? `
+                        <div class="flex items-center justify-center gap-4 mb-6">
+                            <button
+                                id="prev-solution"
+                                data-testid="prev-solution"
+                                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                ${index === 0 ? 'disabled' : ''}
+                            >
+                                Previous
+                            </button>
+                            <span data-testid="current-solution" class="font-semibold">
+                                Solution ${index + 1} of ${solutions.length}
+                            </span>
+                            <button
+                                id="next-solution"
+                                data-testid="next-solution"
+                                class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                ${index === solutions.length - 1 ? 'disabled' : ''}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="flex flex-col items-center">
+                    <div id="board-display" class="mb-6"></div>
+                    
+                    <div class="text-sm text-gray-600 max-w-2xl">
+                        <h3 class="font-semibold mb-2">Solution Array Format:</h3>
+                        <pre class="bg-gray-100 p-3 rounded overflow-x-auto text-left">${JSON.stringify(solution, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            const boardDisplay = document.getElementById('board-display');
+            boardDisplay.appendChild(createChessBoard(solution));
+            
+            // Add event listeners for navigation buttons
+            if (solutions.length > 1) {
+                const prevBtn = document.getElementById('prev-solution');
+                const nextBtn = document.getElementById('next-solution');
+                
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        currentSolutionIndex = Math.max(0, currentSolutionIndex - 1);
+                        displaySolution(currentSolutions, currentSolutionIndex);
+                    });
+                }
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentSolutionIndex = Math.min(currentSolutions.length - 1, currentSolutionIndex + 1);
+                        displaySolution(currentSolutions, currentSolutionIndex);
+                    });
+                }
+            }
+        }
+
+        document.getElementById('solve-button').addEventListener('click', () => {
+            const n = parseInt(document.getElementById('n-input').value);
+            
+            if (n < 1 || n > 9) {
+                alert('Please enter a number between 1 and 9');
+                return;
+            }
+            
+            const solveButton = document.getElementById('solve-button');
+            solveButton.textContent = 'Solving...';
+            solveButton.disabled = true;
+            
+            setTimeout(() => {
+                const solutions = solveNQueens(n);
+                currentSolutions = solutions;
+                currentSolutionIndex = 0;
+                
+                displaySolution(solutions, 0);
+                
+                solveButton.textContent = 'Solve';
+                solveButton.disabled = false;
+            }, 100);
+        });
+    </script>
+</body>
+</html>

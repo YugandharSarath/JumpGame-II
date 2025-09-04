@@ -1,0 +1,10 @@
+{
+  "problem": "N-Queens",
+  "difficulty": "Hard",
+  "category": "Backtracking",
+  "tags": ["Array", "Backtracking", "Recursion", "Chess"],
+  "companiesAsked": ["Amazon", "Adobe", "Apple", "Google", "Microsoft", "Facebook/Meta", "Uber"],
+  "expectedDuration": "45-70 minutes",
+  "timeComplexity": "O(N!)",
+  "spaceComplexity": "O(N²)"
+}
