@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>N-Queens II Problem Solver</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: "Arial", sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
 
         .chess-square {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            border: 1px solid #333;
+            border: 2px solid #333;
         }
 
         .light-square {
@@ -32,16 +32,18 @@
         }
 
         .queen {
-            color: #333;
+            color: #8B0000;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            font-size: 32px;
         }
 
         .solution-container {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             padding: 30px;
             margin: 20px auto;
-            max-width: 800px;
+            max-width: 900px;
         }
 
         .board-container {
@@ -49,6 +51,7 @@
             border: 3px solid #333;
             border-radius: 8px;
             overflow: hidden;
+            margin: 10px;
         }
 
         .count-display {
@@ -60,7 +63,70 @@
             font-size: 2rem;
             font-weight: bold;
             margin: 20px 0;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .navigation-button {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .navigation-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .navigation-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .mode-button {
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .mode-button.primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .mode-button.secondary {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            color: white;
+        }
+
+        .mode-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .mode-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .solution-info {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #6366f1;
         }
     </style>
 </head>
@@ -72,11 +138,11 @@
             </h1>
 
             <div class="text-center mb-6">
-                <p class="text-gray-600 mb-4">
-                    Count the number of distinct solutions to place n queens on an n×n chessboard
+                <p class="text-gray-600 mb-6 text-lg">
+                    Count solutions or view all distinct solutions to place n queens on an n×n chessboard
                 </p>
 
-                <div class="flex items-center justify-center gap-4 mb-6">
+                <div class="flex items-center justify-center gap-4 mb-8">
                     <label for="n-input" class="font-semibold text-lg">Board Size (n):</label>
                     <input
                         id="n-input"
@@ -85,30 +151,48 @@
                         min="1"
                         max="9"
                         value="4"
-                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-24 text-center text-lg"
+                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-24 text-center text-lg focus:border-blue-500 focus:outline-none"
                     />
+                </div>
+
+                <div class="flex justify-center gap-4 mb-6">
                     <button
-                        id="solve-button"
-                        data-testid="solve-button"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                        id="count-button"
+                        data-testid="count-button"
+                        class="mode-button primary"
                     >
                         Count Solutions
                     </button>
+                    <button
+                        id="show-all-button"
+                        data-testid="show-all-button"
+                        class="mode-button secondary"
+                    >
+                        Show All Solutions
+                    </button>
+                </div>
+
+                <div class="text-sm text-gray-600 mb-6">
+                    <p><strong>Count Solutions:</strong> Fast - shows only the number of solutions</p>
+                    <p><strong>Show All Solutions:</strong> Visual - displays each solution with queen placements</p>
                 </div>
             </div>
 
             <div id="results" class="text-center">
-                <p class="text-gray-500">Enter a board size and click "Count Solutions" to see the result</p>
+                <p class="text-gray-500 text-lg">
+                    Choose "Count Solutions" for quick results or "Show All Solutions" to see each arrangement
+                </p>
             </div>
         </div>
     </div>
 
     <script>
+
         function totalNQueens(n) {
             let count = 0;
             const cols = new Set();
-            const diag1 = new Set(); 
-            const diag2 = new Set(); 
+            const diag1 = new Set();
+            const diag2 = new Set();
 
             function backtrack(row) {
                 if (row === n) {
@@ -140,9 +224,41 @@
             return count;
         }
 
-        function createVisualizationBoard(n) {
+        function getAllNQueensSolutions(n) {
+            const result = [];
+            const board = Array(n).fill().map(() => Array(n).fill('.'));
+
+            function isValid(row, col) {
+                for (let i = 0; i < row; i++) if (board[i][col] === 'Q') return false;
+                for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--)
+                    if (board[i][j] === 'Q') return false;
+                for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++)
+                    if (board[i][j] === 'Q') return false;
+                return true;
+            }
+
+            function backtrack(row) {
+                if (row === n) {
+                    result.push(board.map(row => row.join('')));
+                    return;
+                }
+                for (let col = 0; col < n; col++) {
+                    if (isValid(row, col)) {
+                        board[row][col] = 'Q';
+                        backtrack(row + 1);
+                        board[row][col] = '.';
+                    }
+                }
+            }
+
+            backtrack(0);
+            return result;
+        }
+
+        function createChessBoard(solution = null) {
+            const n = parseInt(document.getElementById('n-input').value);
             const boardDiv = document.createElement('div');
-            boardDiv.className = 'board-container mb-4';
+            boardDiv.className = 'board-container';
             boardDiv.setAttribute('data-testid', 'chess-board');
 
             for (let row = 0; row < n; row++) {
@@ -154,6 +270,21 @@
                     square.className = `chess-square ${
                         (row + col) % 2 === 0 ? 'light-square' : 'dark-square'
                     }`;
+
+                    if (solution && solution[row] && solution[row][col] === 'Q') {
+
+                        const queenSymbols = ['♛', '♕', '👑', 'Q'];
+                        let queenSymbol = 'Q'; 
+
+                        for (let symbol of queenSymbols) {
+                            queenSymbol = symbol;
+                            break;
+                        }
+
+                        square.innerHTML = queenSymbol;
+                        square.classList.add('queen');
+                    }
+
                     rowDiv.appendChild(square);
                 }
 
@@ -163,19 +294,25 @@
             return boardDiv;
         }
 
-        function displayResult(n, count) {
+        let allSolutions = [];
+        let currentSolutionIndex = 0;
+        let isShowAllMode = false;
+
+        function displayCountResult(n, count) {
             const resultsDiv = document.getElementById('results');
 
             if (count === 0) {
                 resultsDiv.innerHTML = `
                     <div class="text-orange-600 py-4">
-                        <div class="count-display bg-orange-500">
+                        <div class="count-display bg-gradient-to-r from-orange-500 to-red-500">
                             0 Solutions
                         </div>
-                        <p>No solutions exist for n = ${n}</p>
+                        <p class="text-lg mb-4">No solutions exist for n = ${n}</p>
                         <div class="mt-4">
-                            <p class="text-sm text-gray-600 mb-2">Empty ${n}×${n} chessboard for reference:</p>
-                            ${createVisualizationBoard(n, false).outerHTML}
+                            <p class="text-sm text-gray-700 mb-2 font-semibold">Empty ${n}×${n} chessboard:</p>
+                            <div class="flex justify-center">
+                                ${createChessBoard().outerHTML}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -186,63 +323,195 @@
                             ${count} Solution${count !== 1 ? 's' : ''}
                         </div>
                         <p class="text-lg mb-4">
-                            There ${count === 1 ? 'is' : 'are'} ${count} distinct way${count !== 1 ? 's' : ''} to place ${n} queens on a ${n}×${n} chessboard
+                            There ${count === 1 ? 'is' : 'are'} <strong>${count}</strong> distinct way${count !== 1 ? 's' : ''} to place ${n} queens on a ${n}×${n} chessboard
                         </p>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-700 mb-2 font-semibold">Example Solution:</p>
-                            ${createVisualizationBoard(n, true).outerHTML}
+                        <div class="solution-info">
+                            <p class="text-gray-700 mb-2">
+                                <i class="fas fa-info-circle"></i> This shows only the count for performance.
+                            </p>
+                            <p class="text-gray-600">
+                                Click <strong>"Show All Solutions"</strong> to see each queen arrangement visually.
+                            </p>
                         </div>
-                        <div class="text-sm text-gray-600 mt-4">
-                            <p>One of ${count} valid arrangements shown above</p>
-                            <p class="mt-1">♛ = Queen placed safely (no attacks)</p>
+                        <div class="mt-4">
+                            <p class="text-sm text-gray-700 mb-2 font-semibold">Reference ${n}×${n} chessboard:</p>
+                            <div class="flex justify-center">
+                                ${createChessBoard().outerHTML}
+                            </div>
                         </div>
                     </div>
                 `;
             }
         }
 
-        const expectedCounts = {
-            1: 1, 2: 0, 3: 0, 4: 2, 5: 10, 
-            6: 4, 7: 40, 8: 92, 9: 352
-        };
+        function displayAllSolutions(solutions) {
+            const n = parseInt(document.getElementById('n-input').value);
+            const resultsDiv = document.getElementById('results');
 
-        document.getElementById('solve-button').addEventListener('click', () => {
+            if (solutions.length === 0) {
+                displayCountResult(n, 0);
+                return;
+            }
+
+            const solution = solutions[currentSolutionIndex];
+
+            resultsDiv.innerHTML = `
+                <div class="text-center">
+                    <div class="count-display mb-6" data-testid="solution-count">
+                        ${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} Found
+                    </div>
+
+                    ${solutions.length > 1 ? `
+                        <div class="flex items-center justify-center gap-6 mb-8">
+                            <button
+                                id="prev-solution"
+                                data-testid="prev-solution"
+                                class="navigation-button ${currentSolutionIndex === 0 ? '' : ''}"
+                                ${currentSolutionIndex === 0 ? 'disabled' : ''}
+                            >
+                                ← Previous
+                            </button>
+                            <div class="solution-info" style="margin: 0; padding: 15px 25px;">
+                                <span data-testid="current-solution" class="font-bold text-xl text-gray-800">
+                                    Solution ${currentSolutionIndex + 1} of ${solutions.length}
+                                </span>
+                            </div>
+                            <button
+                                id="next-solution"
+                                data-testid="next-solution"
+                                class="navigation-button ${currentSolutionIndex === solutions.length - 1 ? '' : ''}"
+                                ${currentSolutionIndex === solutions.length - 1 ? 'disabled' : ''}
+                            >
+                                Next →
+                            </button>
+                        </div>
+                    ` : `
+                        <div class="solution-info mb-6">
+                            <span class="font-bold text-xl text-gray-800">
+                                The Only Solution for ${n}×${n} board
+                            </span>
+                        </div>
+                    `}
+
+                    <div class="flex justify-center mb-6">
+                        <div id="current-board"></div>
+                    </div>
+
+                    <div class="solution-info">
+                        <h4 class="font-bold text-gray-800 mb-3">Solution Array Format:</h4>
+                        <pre class="bg-white p-4 rounded-lg border text-sm text-left overflow-x-auto">${JSON.stringify(solution, null, 2)}</pre>
+                        <p class="text-sm text-gray-600 mt-3">
+                            ♛ = Queen placed safely (no two queens attack each other)
+                        </p>
+                    </div>
+                </div>
+            `;
+
+            const boardContainer = document.getElementById('current-board');
+            boardContainer.appendChild(createChessBoard(solution));
+
+            if (solutions.length > 1) {
+                const prevBtn = document.getElementById('prev-solution');
+                const nextBtn = document.getElementById('next-solution');
+
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', () => {
+                        currentSolutionIndex = Math.max(0, currentSolutionIndex - 1);
+                        displayAllSolutions(allSolutions);
+                    });
+                }
+
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        currentSolutionIndex = Math.min(allSolutions.length - 1, currentSolutionIndex + 1);
+                        displayAllSolutions(allSolutions);
+                    });
+                }
+            }
+        }
+
+        function addPerformanceInfo(duration) {
+            const resultsDiv = document.getElementById('results');
+            const expectedCounts = { 1: 1, 2: 0, 3: 0, 4: 2, 5: 10, 6: 4, 7: 40, 8: 92, 9: 352 };
             const n = parseInt(document.getElementById('n-input').value);
 
+            const perfInfo = document.createElement('div');
+            perfInfo.className = 'solution-info mt-6';
+            perfInfo.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div>
+                        <span class="font-semibold">Execution Time:</span><br />
+                        <span class="text-blue-600">${duration}ms</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Board Size:</span><br />
+                        <span class="text-blue-600">${n}×${n} = ${n*n} squares</span>
+                    </div>
+                    <div>
+                        <span class="font-semibold">Expected Count:</span><br />
+                        ${expectedCounts[n] !== undefined ? 
+                            `<span class="text-green-600">✓ ${expectedCounts[n]}</span>` : 
+                            '<span class="text-gray-500">Not available</span>'
+                        }
+                    </div>
+                </div>
+            `;
+            resultsDiv.appendChild(perfInfo);
+        }
+
+        document.getElementById('count-button').addEventListener('click', () => {
+            const n = parseInt(document.getElementById('n-input').value);
             if (n < 1 || n > 9) {
                 alert('Please enter a number between 1 and 9');
                 return;
             }
 
-            const solveButton = document.getElementById('solve-button');
-            solveButton.textContent = 'Counting...';
-            solveButton.disabled = true;
+            isShowAllMode = false;
+            const button = document.getElementById('count-button');
+            button.textContent = 'Counting...';
+            button.disabled = true;
 
             setTimeout(() => {
                 const startTime = performance.now();
                 const count = totalNQueens(n);
                 const endTime = performance.now();
-                const duration = (endTime - startTime).toFixed(2);
 
-                displayResult(n, count);
+                displayCountResult(n, count);
+                addPerformanceInfo((endTime - startTime).toFixed(2));
 
-                const resultsDiv = document.getElementById('results');
-                const perfInfo = document.createElement('div');
-                perfInfo.className = 'text-xs text-gray-500 mt-4';
-                perfInfo.innerHTML = `
-                    <p>Computed in ${duration}ms</p>
-                    ${expectedCounts[n] !== undefined ? 
-                        `<p>✓ Matches expected count: ${expectedCounts[n]}</p>` : ''}
-                `;
-                resultsDiv.appendChild(perfInfo);
+                button.textContent = 'Count Solutions';
+                button.disabled = false;
+            }, 100);
+        });
 
-                solveButton.textContent = 'Count Solutions';
-                solveButton.disabled = false;
+        document.getElementById('show-all-button').addEventListener('click', () => {
+            const n = parseInt(document.getElementById('n-input').value);
+            if (n < 1 || n > 9) {
+                alert('Please enter a number between 1 and 9');
+                return;
+            }
+
+            isShowAllMode = true;
+            currentSolutionIndex = 0;
+            const button = document.getElementById('show-all-button');
+            button.textContent = 'Loading...';
+            button.disabled = true;
+
+            setTimeout(() => {
+                const startTime = performance.now();
+                allSolutions = getAllNQueensSolutions(n);
+                const endTime = performance.now();
+
+                displayAllSolutions(allSolutions);
+                addPerformanceInfo((endTime - startTime).toFixed(2));
+
+                button.textContent = 'Show All Solutions';
+                button.disabled = false;
             }, 100);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('solve-button').click();
+            document.getElementById('count-button').click();
         });
     </script>
 </body>

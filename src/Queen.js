@@ -75,6 +75,7 @@ export default function NQueens2App() {
   const [isLoading, setIsLoading] = useState(false);
   const [executionTime, setExecutionTime] = useState(null);
   const [showAllSolutions, setShowAllSolutions] = useState(false);
+  const [debugInfo, setDebugInfo] = useState('');
 
   const expectedCounts = {
     1: 1, 2: 0, 3: 0, 4: 2, 5: 10, 
@@ -88,6 +89,7 @@ export default function NQueens2App() {
     setAllSolutions([]);
     setExecutionTime(null);
     setShowAllSolutions(false);
+    setDebugInfo('Running count only...');
 
     setTimeout(() => {
       const startTime = performance.now();
@@ -96,6 +98,7 @@ export default function NQueens2App() {
 
       setSolutionCount(count);
       setExecutionTime((endTime - startTime).toFixed(2));
+      setDebugInfo(`Count complete: ${count} solutions found`);
       setIsLoading(false);
     }, 100);
   };
@@ -108,32 +111,45 @@ export default function NQueens2App() {
     setExecutionTime(null);
     setCurrentSolution(0);
     setShowAllSolutions(true);
+    setDebugInfo('Finding all solutions...');
 
     setTimeout(() => {
       const startTime = performance.now();
       const solutions = getAllNQueensSolutions(n);
       const endTime = performance.now();
 
+      console.log('All solutions found:', solutions); 
       setAllSolutions(solutions);
       setSolutionCount(solutions.length);
       setExecutionTime((endTime - startTime).toFixed(2));
+      setDebugInfo(`All solutions found: ${solutions.length} total`);
       setIsLoading(false);
     }, 100);
   };
 
   const createBoard = (solution = null) => {
     const squares = [];
+    console.log('Creating board with solution:', solution); 
+
     for (let row = 0; row < n; row++) {
       for (let col = 0; col < n; col++) {
         const isQueen = solution && solution[row] && solution[row][col] === 'Q';
+        console.log(`Position [${row}][${col}]: ${isQueen ? 'QUEEN' : 'empty'}`); 
+
         squares.push(
           <div
             key={`${row}-${col}`}
-            className={`w-8 h-8 flex items-center justify-center border border-gray-400 text-lg font-bold ${
-              (row + col) % 2 === 0 ? "bg-amber-100" : "bg-amber-700 text-white"
+            className={`w-10 h-10 flex items-center justify-center border-2 border-gray-600 text-2xl font-bold ${
+              (row + col) % 2 === 0 ? "bg-yellow-200" : "bg-yellow-600"
             }`}
+            style={{
+              backgroundColor: (row + col) % 2 === 0 ? '#fef3c7' : '#d97706',
+              color: isQueen ? '#dc2626' : 'transparent',
+              fontSize: '24px',
+              fontWeight: 'bold'
+            }}
           >
-            {isQueen ? "♛" : ""}
+            {isQueen ? 'Q' : '•'}
           </div>
         );
       }
@@ -142,23 +158,33 @@ export default function NQueens2App() {
   };
 
   const navigateToSolution = (direction) => {
-    if (direction === 'prev') {
-      setCurrentSolution(Math.max(0, currentSolution - 1));
-    } else {
-      setCurrentSolution(Math.min(allSolutions.length - 1, currentSolution + 1));
-    }
+    const newIndex = direction === 'prev' 
+      ? Math.max(0, currentSolution - 1)
+      : Math.min(allSolutions.length - 1, currentSolution + 1);
+
+    console.log(`Navigating to solution ${newIndex + 1}:`, allSolutions[newIndex]); 
+    setCurrentSolution(newIndex);
   };
 
   return (
     <div className="p-6 max-w-4xl mx-auto min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">
-        N-Queens II Problem Solver
+        N-Queens II Debug Version
       </h1>
 
       <div className="bg-white rounded-xl shadow-lg p-8 mb-6">
+        {}
+        <div className="bg-gray-100 p-4 rounded-lg mb-6">
+          <h3 className="font-bold text-gray-700 mb-2">Debug Info:</h3>
+          <p className="text-sm text-gray-600">{debugInfo}</p>
+          <p className="text-sm text-gray-600">Solutions array length: {allSolutions.length}</p>
+          <p className="text-sm text-gray-600">Current solution index: {currentSolution}</p>
+          <p className="text-sm text-gray-600">Show all solutions mode: {showAllSolutions ? 'YES' : 'NO'}</p>
+        </div>
+
         <div className="text-center mb-6">
           <p className="text-gray-600 text-lg mb-4">
-            Count solutions or view all distinct solutions to place n queens on an n×n chessboard
+            Debug version - Count solutions or view all solutions with detailed logging
           </p>
         </div>
 
@@ -197,11 +223,6 @@ export default function NQueens2App() {
             >
               {isLoading && showAllSolutions ? "Loading..." : "Show All Solutions"}
             </button>
-          </div>
-
-          <div className="text-sm text-gray-500 text-center max-w-md">
-            <p><strong>Count Only:</strong> Fast - just shows the number of solutions</p>
-            <p><strong>Show All:</strong> Slower - displays each solution visually</p>
           </div>
         </div>
 
@@ -260,23 +281,26 @@ export default function NQueens2App() {
 
                 <div className="flex flex-col items-center mb-6">
                   <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                    {allSolutions.length === 1 ? 
-                      `The Only Solution on ${n}×${n} Chessboard` : 
-                      `Solution ${currentSolution + 1} on ${n}×${n} Chessboard`
-                    }
+                    Solution {currentSolution + 1} on {n}×{n} Chessboard
                   </h3>
+
+                  {}
+                  <div className="bg-yellow-100 p-2 rounded mb-4 text-sm">
+                    <strong>Raw solution data:</strong> {JSON.stringify(allSolutions[currentSolution])}
+                  </div>
+
                   <div 
                     data-testid="chess-board"
-                    className="inline-grid border-2 border-gray-800"
+                    className="inline-grid border-4 border-gray-800 bg-gray-800 gap-1 p-2"
                     style={{
-                      gridTemplateColumns: `repeat(${n}, 2rem)`,
-                      gridTemplateRows: `repeat(${n}, 2rem)`
+                      gridTemplateColumns: `repeat(${n}, 2.5rem)`,
+                      gridTemplateRows: `repeat(${n}, 2.5rem)`
                     }}
                   >
                     {createBoard(allSolutions[currentSolution])}
                   </div>
                   <div className="text-sm text-gray-600 mt-2 text-center">
-                    <p>♛ = Queen placed safely (no attacks)</p>
+                    <p>Q = Queen placed safely | • = Empty square</p>
                   </div>
                 </div>
 
@@ -298,38 +322,16 @@ export default function NQueens2App() {
                 </h3>
                 <div 
                   data-testid="chess-board"
-                  className="inline-grid border-2 border-gray-800"
+                  className="inline-grid border-4 border-gray-800 bg-gray-800 gap-1 p-2"
                   style={{
-                    gridTemplateColumns: `repeat(${n}, 2rem)`,
-                    gridTemplateRows: `repeat(${n}, 2rem)`
+                    gridTemplateColumns: `repeat(${n}, 2.5rem)`,
+                    gridTemplateRows: `repeat(${n}, 2.5rem)`
                   }}
                 >
                   {createBoard()}
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
                   Click "Show All Solutions" to see the actual queen placements
-                </p>
-              </div>
-            )}
-
-            {}
-            {solutionCount === 0 && (
-              <div className="flex flex-col items-center mb-6">
-                <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                  Empty {n}×{n} Chessboard (No Solutions Possible)
-                </h3>
-                <div 
-                  data-testid="chess-board"
-                  className="inline-grid border-2 border-gray-800"
-                  style={{
-                    gridTemplateColumns: `repeat(${n}, 2rem)`,
-                    gridTemplateRows: `repeat(${n}, 2rem)`
-                  }}
-                >
-                  {createBoard()}
-                </div>
-                <p className="text-sm text-gray-500 mt-2">
-                  No valid queen placements possible for this board size
                 </p>
               </div>
             )}
