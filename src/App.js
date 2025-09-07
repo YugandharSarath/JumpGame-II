@@ -1,5 +1,5 @@
 import React from 'react';
-import JumpGame from './JumpGame';
+import JumpGame from './JumpGameII';
 import './JumpGameII.css';
 
 function App() {
