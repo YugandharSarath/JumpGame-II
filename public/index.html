@@ -1,518 +1,659 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>N-Queens II Problem Solver</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jump Game II</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body {
-            font-family: "Arial", sans-serif;
+
+        .jump-game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            color: #333;
         }
 
-        .chess-square {
-            width: 45px;
-            height: 45px;
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .visualization-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .array-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .array-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .array-visualization {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .array-element {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            padding: 12px 8px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .array-element.current {
+            background: #ffd700;
+            border-color: #ffb347;
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .array-element.reachable {
+            background: #90EE90;
+            border-color: #32CD32;
+        }
+
+        .array-element.target {
+            background: #ff6b6b;
+            border-color: #ff5252;
+            color: white;
+        }
+
+        .array-element.path {
+            background: #4ecdc4;
+            border-color: #26a69a;
+            color: white;
+        }
+
+        .element-value {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .element-index {
+            font-size: 12px;
+            color: #666;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .result-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 28px;
+            gap: 10px;
+        }
+
+        .result-value {
+            font-size: 2rem;
             font-weight: bold;
+            color: #667eea;
+            margin: 15px 0;
+        }
+
+        .algorithm-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .step {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #667eea;
+            background: white;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step.active {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
             border: 2px solid #333;
         }
 
-        .light-square {
-            background-color: #f0d9b5;
-        }
-
-        .dark-square {
-            background-color: #b58863;
-        }
-
-        .queen {
-            color: #8B0000;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-            font-size: 32px;
-        }
-
-        .solution-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            margin: 20px auto;
-            max-width: 900px;
-        }
-
-        .board-container {
-            display: inline-block;
-            border: 3px solid #333;
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
             border-radius: 8px;
-            overflow: hidden;
-            margin: 10px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
         }
 
-        .count-display {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 20px 0;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .navigation-button {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
+        .complexity-info {
+            background: #e7f3ff;
+            padding: 15px;
             border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
+            margin-top: 15px;
+            border-left: 4px solid #2196f3;
         }
 
-        .navigation-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .array-element {
+                min-width: 50px;
+                padding: 8px 6px;
+            }
         }
 
-        .navigation-button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
 
-        .mode-button {
-            padding: 14px 28px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 10px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .mode-button.primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
+        .pulse {
+            animation: pulse 1s infinite;
         }
 
-        .mode-button.secondary {
-            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-            color: white;
-        }
-
-        .mode-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-
-        .mode-button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .solution-info {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            border-left: 5px solid #6366f1;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
-    <div class="min-h-screen py-8">
-        <div class="solution-container">
-            <h1 class="text-4xl font-bold text-center mb-8 text-gray-800">
-                N-Queens II Problem Solver
-            </h1>
+    <div id="root"></div>
 
-            <div class="text-center mb-6">
-                <p class="text-gray-600 mb-6 text-lg">
-                    Count solutions or view all distinct solutions to place n queens on an n×n chessboard
-                </p>
+    <script type="text/babel">
 
-                <div class="flex items-center justify-center gap-4 mb-8">
-                    <label for="n-input" class="font-semibold text-lg">Board Size (n):</label>
-                    <input
-                        id="n-input"
-                        data-testid="n-input"
-                        type="number"
-                        min="1"
-                        max="9"
-                        value="4"
-                        class="border-2 border-gray-300 rounded-lg px-4 py-2 w-24 text-center text-lg focus:border-blue-500 focus:outline-none"
-                    />
+        const App = () => {
+            return (
+                <div className="App">
+                    <JumpGame />
                 </div>
+            );
+        };
 
-                <div class="flex justify-center gap-4 mb-6">
-                    <button
-                        id="count-button"
-                        data-testid="count-button"
-                        class="mode-button primary"
-                    >
-                        Count Solutions
-                    </button>
-                    <button
-                        id="show-all-button"
-                        data-testid="show-all-button"
-                        class="mode-button secondary"
-                    >
-                        Show All Solutions
-                    </button>
-                </div>
+        const JumpGame = () => {
+            const [nums, setNums] = React.useState([2, 3, 1, 1, 4]);
+            const [inputValue, setInputValue] = React.useState('2,3,1,1,4');
+            const [result, setResult] = React.useState(null);
+            const [isCalculating, setIsCalculating] = React.useState(false);
+            const [error, setError] = React.useState('');
+            const [currentStep, setCurrentStep] = React.useState(-1);
+            const [steps, setSteps] = React.useState([]);
+            const [visualization, setVisualization] = React.useState({
+                current: -1,
+                reachable: [],
+                path: []
+            });
 
-                <div class="text-sm text-gray-600 mb-6">
-                    <p><strong>Count Solutions:</strong> Fast - shows only the number of solutions</p>
-                    <p><strong>Show All Solutions:</strong> Visual - displays each solution with queen placements</p>
-                </div>
-            </div>
+            const jump = (nums) => {
+                const n = nums.length;
+                if (n <= 1) return 0;
 
-            <div id="results" class="text-center">
-                <p class="text-gray-500 text-lg">
-                    Choose "Count Solutions" for quick results or "Show All Solutions" to see each arrangement
-                </p>
-            </div>
-        </div>
-    </div>
+                const steps = [];
+                let jumps = 0;
+                let currentEnd = 0;
+                let farthest = 0;
+                let path = [];
+                let currentPos = 0;
 
-    <script>
+                for (let i = 0; i < n - 1; i++) {
+                    farthest = Math.max(farthest, i + nums[i]);
 
-        function totalNQueens(n) {
-            let count = 0;
-            const cols = new Set();
-            const diag1 = new Set();
-            const diag2 = new Set();
+                    steps.push({
+                        step: steps.length + 1,
+                        description: `At index ${i}, can reach up to index ${i + nums[i]}. Farthest reachable: ${farthest}`,
+                        current: i,
+                        reachable: Array.from({length: Math.min(i + nums[i] + 1, n)}, (_, idx) => idx).filter(idx => idx > i),
+                        jumps: jumps,
+                        currentEnd: currentEnd,
+                        farthest: farthest
+                    });
 
-            function backtrack(row) {
-                if (row === n) {
-                    count++;
-                    return;
-                }
+                    if (i === currentEnd) {
+                        jumps++;
+                        currentEnd = farthest;
+                        path.push(i);
 
-                for (let col = 0; col < n; col++) {
-                    const d1 = row - col;
-                    const d2 = row + col;
+                        steps.push({
+                            step: steps.length + 1,
+                            description: `Made jump ${jumps}. New boundary: ${currentEnd}`,
+                            current: i,
+                            reachable: [],
+                            jumps: jumps,
+                            currentEnd: currentEnd,
+                            farthest: farthest,
+                            jumpMade: true
+                        });
 
-                    if (cols.has(col) || diag1.has(d1) || diag2.has(d2)) {
-                        continue;
-                    }
-
-                    cols.add(col);
-                    diag1.add(d1);
-                    diag2.add(d2);
-
-                    backtrack(row + 1);
-
-                    cols.delete(col);
-                    diag1.delete(d1);
-                    diag2.delete(d2);
-                }
-            }
-
-            backtrack(0);
-            return count;
-        }
-
-        function getAllNQueensSolutions(n) {
-            const result = [];
-            const board = Array(n).fill().map(() => Array(n).fill('.'));
-
-            function isValid(row, col) {
-                for (let i = 0; i < row; i++) if (board[i][col] === 'Q') return false;
-                for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--)
-                    if (board[i][j] === 'Q') return false;
-                for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++)
-                    if (board[i][j] === 'Q') return false;
-                return true;
-            }
-
-            function backtrack(row) {
-                if (row === n) {
-                    result.push(board.map(row => row.join('')));
-                    return;
-                }
-                for (let col = 0; col < n; col++) {
-                    if (isValid(row, col)) {
-                        board[row][col] = 'Q';
-                        backtrack(row + 1);
-                        board[row][col] = '.';
-                    }
-                }
-            }
-
-            backtrack(0);
-            return result;
-        }
-
-        function createChessBoard(solution = null) {
-            const n = parseInt(document.getElementById('n-input').value);
-            const boardDiv = document.createElement('div');
-            boardDiv.className = 'board-container';
-            boardDiv.setAttribute('data-testid', 'chess-board');
-
-            for (let row = 0; row < n; row++) {
-                const rowDiv = document.createElement('div');
-                rowDiv.style.display = 'flex';
-
-                for (let col = 0; col < n; col++) {
-                    const square = document.createElement('div');
-                    square.className = `chess-square ${
-                        (row + col) % 2 === 0 ? 'light-square' : 'dark-square'
-                    }`;
-
-                    if (solution && solution[row] && solution[row][col] === 'Q') {
-
-                        const queenSymbols = ['♛', '♕', '👑', 'Q'];
-                        let queenSymbol = 'Q'; 
-
-                        for (let symbol of queenSymbols) {
-                            queenSymbol = symbol;
+                        if (currentEnd >= n - 1) {
+                            path.push(n - 1);
                             break;
                         }
-
-                        square.innerHTML = queenSymbol;
-                        square.classList.add('queen');
                     }
-
-                    rowDiv.appendChild(square);
                 }
 
-                boardDiv.appendChild(rowDiv);
-            }
+                return { jumps, steps, path };
+            };
 
-            return boardDiv;
-        }
+            const handleInputChange = (e) => {
+                setInputValue(e.target.value);
+            };
 
-        let allSolutions = [];
-        let currentSolutionIndex = 0;
-        let isShowAllMode = false;
+            const parseInput = () => {
+                try {
+                    const parsed = inputValue.split(',').map(num => {
+                        const trimmed = num.trim();
+                        if (trimmed === '') throw new Error('Empty value');
+                        const parsed = parseInt(trimmed);
+                        if (isNaN(parsed)) throw new Error(`"${trimmed}" is not a valid number`);
+                        if (parsed < 0) throw new Error('Numbers must be non-negative');
+                        if (parsed > 1000) throw new Error('Numbers must be <= 1000');
+                        return parsed;
+                    });
 
-        function displayCountResult(n, count) {
-            const resultsDiv = document.getElementById('results');
+                    if (parsed.length === 0) throw new Error('Array cannot be empty');
+                    if (parsed.length > 10000) throw new Error('Array length must be <= 10000');
 
-            if (count === 0) {
-                resultsDiv.innerHTML = `
-                    <div class="text-orange-600 py-4">
-                        <div class="count-display bg-gradient-to-r from-orange-500 to-red-500">
-                            0 Solutions
-                        </div>
-                        <p class="text-lg mb-4">No solutions exist for n = ${n}</p>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-700 mb-2 font-semibold">Empty ${n}×${n} chessboard:</p>
-                            <div class="flex justify-center">
-                                ${createChessBoard().outerHTML}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                resultsDiv.innerHTML = `
-                    <div class="text-green-600 py-4">
-                        <div class="count-display" data-testid="solution-count">
-                            ${count} Solution${count !== 1 ? 's' : ''}
-                        </div>
-                        <p class="text-lg mb-4">
-                            There ${count === 1 ? 'is' : 'are'} <strong>${count}</strong> distinct way${count !== 1 ? 's' : ''} to place ${n} queens on a ${n}×${n} chessboard
-                        </p>
-                        <div class="solution-info">
-                            <p class="text-gray-700 mb-2">
-                                <i class="fas fa-info-circle"></i> This shows only the count for performance.
-                            </p>
-                            <p class="text-gray-600">
-                                Click <strong>"Show All Solutions"</strong> to see each queen arrangement visually.
-                            </p>
-                        </div>
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-700 mb-2 font-semibold">Reference ${n}×${n} chessboard:</p>
-                            <div class="flex justify-center">
-                                ${createChessBoard().outerHTML}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-        }
+                    return parsed;
+                } catch (err) {
+                    throw new Error(`Invalid input: ${err.message}`);
+                }
+            };
 
-        function displayAllSolutions(solutions) {
-            const n = parseInt(document.getElementById('n-input').value);
-            const resultsDiv = document.getElementById('results');
+            const calculateJumps = async () => {
+                try {
+                    setError('');
+                    setIsCalculating(true);
+                    setResult(null);
+                    setCurrentStep(-1);
+                    setVisualization({ current: -1, reachable: [], path: [] });
 
-            if (solutions.length === 0) {
-                displayCountResult(n, 0);
-                return;
-            }
+                    const parsedNums = parseInput();
+                    setNums(parsedNums);
 
-            const solution = solutions[currentSolutionIndex];
+                    await new Promise(resolve => setTimeout(resolve, 500));
 
-            resultsDiv.innerHTML = `
-                <div class="text-center">
-                    <div class="count-display mb-6" data-testid="solution-count">
-                        ${solutions.length} Solution${solutions.length !== 1 ? 's' : ''} Found
-                    </div>
+                    const { jumps, steps, path } = jump(parsedNums);
 
-                    ${solutions.length > 1 ? `
-                        <div class="flex items-center justify-center gap-6 mb-8">
-                            <button
-                                id="prev-solution"
-                                data-testid="prev-solution"
-                                class="navigation-button ${currentSolutionIndex === 0 ? '' : ''}"
-                                ${currentSolutionIndex === 0 ? 'disabled' : ''}
-                            >
-                                ← Previous
-                            </button>
-                            <div class="solution-info" style="margin: 0; padding: 15px 25px;">
-                                <span data-testid="current-solution" class="font-bold text-xl text-gray-800">
-                                    Solution ${currentSolutionIndex + 1} of ${solutions.length}
-                                </span>
-                            </div>
-                            <button
-                                id="next-solution"
-                                data-testid="next-solution"
-                                class="navigation-button ${currentSolutionIndex === solutions.length - 1 ? '' : ''}"
-                                ${currentSolutionIndex === solutions.length - 1 ? 'disabled' : ''}
-                            >
-                                Next →
-                            </button>
-                        </div>
-                    ` : `
-                        <div class="solution-info mb-6">
-                            <span class="font-bold text-xl text-gray-800">
-                                The Only Solution for ${n}×${n} board
-                            </span>
-                        </div>
-                    `}
+                    setResult(jumps);
+                    setSteps(steps);
 
-                    <div class="flex justify-center mb-6">
-                        <div id="current-board"></div>
-                    </div>
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setIsCalculating(false);
+                }
+            };
 
-                    <div class="solution-info">
-                        <h4 class="font-bold text-gray-800 mb-3">Solution Array Format:</h4>
-                        <pre class="bg-white p-4 rounded-lg border text-sm text-left overflow-x-auto">${JSON.stringify(solution, null, 2)}</pre>
-                        <p class="text-sm text-gray-600 mt-3">
-                            ♛ = Queen placed safely (no two queens attack each other)
-                        </p>
-                    </div>
-                </div>
-            `;
-
-            const boardContainer = document.getElementById('current-board');
-            boardContainer.appendChild(createChessBoard(solution));
-
-            if (solutions.length > 1) {
-                const prevBtn = document.getElementById('prev-solution');
-                const nextBtn = document.getElementById('next-solution');
-
-                if (prevBtn) {
-                    prevBtn.addEventListener('click', () => {
-                        currentSolutionIndex = Math.max(0, currentSolutionIndex - 1);
-                        displayAllSolutions(allSolutions);
+            const visualizeStep = async (stepIndex) => {
+                if (stepIndex >= 0 && stepIndex < steps.length) {
+                    setCurrentStep(stepIndex);
+                    const step = steps[stepIndex];
+                    setVisualization({
+                        current: step.current,
+                        reachable: step.reachable || [],
+                        path: steps.slice(0, stepIndex + 1)
+                                   .filter(s => s.jumpMade)
+                                   .map(s => s.current)
                     });
                 }
+            };
 
-                if (nextBtn) {
-                    nextBtn.addEventListener('click', () => {
-                        currentSolutionIndex = Math.min(allSolutions.length - 1, currentSolutionIndex + 1);
-                        displayAllSolutions(allSolutions);
-                    });
+            const resetVisualization = () => {
+                setCurrentStep(-1);
+                setVisualization({ current: -1, reachable: [], path: [] });
+            };
+
+            const loadExample = (exampleNums) => {
+                const exampleStr = exampleNums.join(',');
+                setInputValue(exampleStr);
+                setNums(exampleNums);
+                setResult(null);
+                setError('');
+                setCurrentStep(-1);
+                setSteps([]);
+                setVisualization({ current: -1, reachable: [], path: [] });
+            };
+
+            const getElementClass = (index) => {
+                let classes = 'array-element';
+
+                if (index === visualization.current) {
+                    classes += ' current';
+                } else if (visualization.reachable.includes(index)) {
+                    classes += ' reachable';
+                } else if (visualization.path.includes(index)) {
+                    classes += ' path';
                 }
-            }
-        }
 
-        function addPerformanceInfo(duration) {
-            const resultsDiv = document.getElementById('results');
-            const expectedCounts = { 1: 1, 2: 0, 3: 0, 4: 2, 5: 10, 6: 4, 7: 40, 8: 92, 9: 352 };
-            const n = parseInt(document.getElementById('n-input').value);
+                if (index === nums.length - 1) {
+                    classes += ' target';
+                }
 
-            const perfInfo = document.createElement('div');
-            perfInfo.className = 'solution-info mt-6';
-            perfInfo.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                    <div>
-                        <span class="font-semibold">Execution Time:</span><br />
-                        <span class="text-blue-600">${duration}ms</span>
+                return classes;
+            };
+
+            return (
+                <div className="jump-game-container" data-testid="jump-game-container">
+                    <div className="header">
+                        <h1>Jump Game II</h1>
+                        <p>Find the minimum number of jumps to reach the last index</p>
                     </div>
-                    <div>
-                        <span class="font-semibold">Board Size:</span><br />
-                        <span class="text-blue-600">${n}×${n} = ${n*n} squares</span>
+
+                    <div className="main-content">
+                        <div className="input-section">
+                            <h2>Input Configuration</h2>
+
+                            <div className="input-group">
+                                <label htmlFor="array-input">
+                                    Array (comma-separated integers):
+                                </label>
+                                <input
+                                    id="array-input"
+                                    data-testid="array-input"
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g., 2,3,1,1,4"
+                                    className="array-input"
+                                />
+                            </div>
+
+                            <div className="button-group">
+                                <button
+                                    data-testid="calculate-btn"
+                                    onClick={calculateJumps}
+                                    disabled={isCalculating}
+                                    className="btn btn-primary"
+                                >
+                                    {isCalculating ? 'Calculating...' : 'Calculate Jumps'}
+                                </button>
+
+                                <button
+                                    data-testid="example1-btn"
+                                    onClick={() => loadExample([2, 3, 1, 1, 4])}
+                                    className="btn btn-secondary"
+                                >
+                                    Example 1
+                                </button>
+
+                                <button
+                                    data-testid="example2-btn"
+                                    onClick={() => loadExample([2, 3, 0, 1, 4])}
+                                    className="btn btn-secondary"
+                                >
+                                    Example 2
+                                </button>
+                            </div>
+
+                            {error && (
+                                <div className="error-message" data-testid="error-message">
+                                    {error}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="visualization-section">
+                            <h2>Array Visualization</h2>
+
+                            <div className="legend">
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#ffd700', borderColor: '#ffb347'}}></div>
+                                    Current Position
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#90EE90', borderColor: '#32CD32'}}></div>
+                                    Reachable
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#4ecdc4', borderColor: '#26a69a'}}></div>
+                                    Jump Path
+                                </div>
+                                <div className="legend-item">
+                                    <div className="legend-color" style={{backgroundColor: '#ff6b6b', borderColor: '#ff5252'}}></div>
+                                    Target
+                                </div>
+                            </div>
+
+                            <div className="array-visualization" data-testid="array-visualization">
+                                {nums.map((num, index) => (
+                                    <div
+                                        key={index}
+                                        className={getElementClass(index)}
+                                        data-testid={`array-element-${index}`}
+                                    >
+                                        <div className="element-value">{num}</div>
+                                        <div className="element-index">{index}</div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {steps.length > 0 && (
+                                <div className="button-group">
+                                    <button
+                                        data-testid="visualize-btn"
+                                        onClick={() => {
+                                            if (currentStep < steps.length - 1) {
+                                                visualizeStep(currentStep + 1);
+                                            } else {
+                                                visualizeStep(0);
+                                            }
+                                        }}
+                                        className="btn btn-success"
+                                    >
+                                        {currentStep < steps.length - 1 ? 'Next Step' : 'Restart'}
+                                    </button>
+
+                                    <button
+                                        data-testid="reset-btn"
+                                        onClick={resetVisualization}
+                                        className="btn btn-secondary"
+                                    >
+                                        Reset
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    <div>
-                        <span class="font-semibold">Expected Count:</span><br />
-                        ${expectedCounts[n] !== undefined ? 
-                            `<span class="text-green-600">✓ ${expectedCounts[n]}</span>` : 
-                            '<span class="text-gray-500">Not available</span>'
-                        }
-                    </div>
+
+                    {result !== null && (
+                        <div className="result-section fade-in" data-testid="result-section">
+                            <h2 className="result-title">
+                                🎯 Result
+                            </h2>
+                            <div className="result-value" data-testid="result-value">
+                                Minimum jumps: {result}
+                            </div>
+
+                            <div className="complexity-info">
+                                <strong>Time Complexity:</strong> O(n) - Single pass through array<br/>
+                                <strong>Space Complexity:</strong> O(1) - Only constant extra space used<br/>
+                                <strong>Algorithm:</strong> Greedy approach using jump boundaries
+                            </div>
+
+                            {steps.length > 0 && (
+                                <div className="algorithm-steps">
+                                    <h3>Algorithm Steps:</h3>
+                                    {steps.map((step, index) => (
+                                        <div
+                                            key={index}
+                                            className={`step ${currentStep === index ? 'active' : ''}`}
+                                            data-testid={`step-${index}`}
+                                        >
+                                            <strong>Step {step.step}:</strong> {step.description}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-            `;
-            resultsDiv.appendChild(perfInfo);
-        }
+            );
+        };
 
-        document.getElementById('count-button').addEventListener('click', () => {
-            const n = parseInt(document.getElementById('n-input').value);
-            if (n < 1 || n > 9) {
-                alert('Please enter a number between 1 and 9');
-                return;
-            }
-
-            isShowAllMode = false;
-            const button = document.getElementById('count-button');
-            button.textContent = 'Counting...';
-            button.disabled = true;
-
-            setTimeout(() => {
-                const startTime = performance.now();
-                const count = totalNQueens(n);
-                const endTime = performance.now();
-
-                displayCountResult(n, count);
-                addPerformanceInfo((endTime - startTime).toFixed(2));
-
-                button.textContent = 'Count Solutions';
-                button.disabled = false;
-            }, 100);
-        });
-
-        document.getElementById('show-all-button').addEventListener('click', () => {
-            const n = parseInt(document.getElementById('n-input').value);
-            if (n < 1 || n > 9) {
-                alert('Please enter a number between 1 and 9');
-                return;
-            }
-
-            isShowAllMode = true;
-            currentSolutionIndex = 0;
-            const button = document.getElementById('show-all-button');
-            button.textContent = 'Loading...';
-            button.disabled = true;
-
-            setTimeout(() => {
-                const startTime = performance.now();
-                allSolutions = getAllNQueensSolutions(n);
-                const endTime = performance.now();
-
-                displayAllSolutions(allSolutions);
-                addPerformanceInfo((endTime - startTime).toFixed(2));
-
-                button.textContent = 'Show All Solutions';
-                button.disabled = false;
-            }, 100);
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('count-button').click();
-        });
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>

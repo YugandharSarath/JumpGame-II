@@ -1,160 +1,165 @@
+# Jump Game II - Test Cases
 
+## Example Test Cases
 
-## Basic Test Cases
+### Example 1
+**Input**: `nums = [2,3,1,1,4]`
+**Output**: `2`
+**Explanation**: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
 
-### Test Case 1: n = 1 (single solution)
+**Step-by-step**:
+1. Start at index 0 (value=2): can reach indices 1, 2
+2. Jump to index 1 (value=3): can reach indices 2, 3, 4
+3. Jump to index 4: reached the end
+4. Total jumps: 2
+
+### Example 2
+**Input**: `nums = [2,3,0,1,4]`
+**Output**: `2`
+**Explanation**: Same as Example 1, but with a 0 at index 2.
+
+**Step-by-step**:
+1. Start at index 0 (value=2): can reach indices 1, 2
+2. Jump to index 1 (value=3): can reach indices 2, 3, 4
+3. Jump to index 4: reached the end
+4. Total jumps: 2
+
+## Edge Cases
+
+### Single Element
+**Input**: `nums = [0]`
+**Output**: `0`
+**Explanation**: Already at the target index.
+
+### Two Elements
+**Input**: `nums = [1,0]`
+**Output**: `1`
+**Explanation**: One jump from index 0 to index 1.
+
+**Input**: `nums = [2,1]`
+**Output**: `1`
+**Explanation**: One jump from index 0 to index 1.
+
+### Large Single Jump
+**Input**: `nums = [5,1,1,1,1,1]`
+**Output**: `1`
+**Explanation**: Can jump directly from index 0 to index 5.
+
+### All Minimum Jumps
+**Input**: `nums = [1,1,1,1,1]`
+**Output**: `4`
+**Explanation**: Must make 4 jumps: 0→1→2→3→4.
+
+### Mixed Values
+**Input**: `nums = [1,2,3]`
+**Output**: `2`
+**Explanation**: 0→1→2 (2 jumps) or 0→2 (1 jump), but from index 2 we need one more jump, so minimum is 2.
+
+Wait, let me recalculate: from index 0 we can reach index 1, from index 1 we can reach up to index 3, so it should be 1 jump.
+
+**Corrected**: `nums = [1,2,3]` → Output: `1` (0→2 in one jump)
+
+### Zero Obstacles
+**Input**: `nums = [2,0,0,1,4]`
+**Output**: `2`
+**Explanation**: 0→1→4 or 0→2→4, both take 2 jumps.
+
+Wait, from index 0 (value=2) we can reach index 2, then from index 2 (value=0) we can't move. Let me recalculate:
+From index 0 we can reach indices 1,2. From index 1 (value=0) we can't move further. This seems impossible.
+
+**Corrected**: `nums = [3,0,0,1,4]` → Output: `2`
+**Explanation**: 0→3→4 (2 jumps)
+
+## Comprehensive Test Suite
+
+### Basic Cases
 ```javascript
-Input: n = 1
-Expected Output: 1
-````
 
-### Test Case 2: n = 2 (no solution)
+testCase([0], 0)
+testCase([1,0], 1) 
+testCase([2,1], 1)
 
-```javascript
-Input: n = 2
-Expected Output: 0
+testCase([1,1,1], 2)
+testCase([1,2,1], 2) 
+testCase([2,1,1], 2)
+testCase([1,1,2], 2)
 ```
 
-### Test Case 3: n = 3 (no solution)
-
+### Medium Cases
 ```javascript
-Input: n = 3
-Expected Output: 0
+
+testCase([2,3,1,1,4], 2)
+testCase([2,3,0,1,4], 2)
+
+testCase([1,2,3,4,5], 1)
+testCase([5,4,3,2,1,0], 1)
+testCase([1,1,1,1,1,1], 5)
+testCase([2,2,2,2,2], 3)
 ```
 
-### Test Case 4: n = 4 (classic 4-queens)
-
+### Complex Cases
 ```javascript
-Input: n = 4
-Expected Output: 2
+
+testCase([10,1,1,1,1,1,1,1,1,1,1], 1)
+testCase([1,10,1,1,1,1,1,1,1,1,1], 2)
+
+testCase([3,0,0,0,4,0,0], 2)
+testCase([4,1,1,1,1,1,1,1], 2)
+
+testCase([1,1,1,1,0], 4)
+testCase([2,1,0,3,0], 2)
 ```
 
-### Test Case 5: n = 5
-
+### Boundary Cases
 ```javascript
-Input: n = 5
-Expected Output: 10
+
+testCase(Array(10000).fill(1), 9999)  
+testCase([9999].concat(Array(9999).fill(0)), 1)  
+
+testCase([1,0], 1)
+testCase([0,1], "impossible") 
+
+testCase([1000,0], 1)
+testCase([1,1000], 1)
 ```
-
-### Test Case 6: n = 6
-
-```javascript
-Input: n = 6
-Expected Output: 4
-```
-
-### Test Case 7: n = 7
-
-```javascript
-Input: n = 7
-Expected Output: 40
-```
-
-### Test Case 8: n = 8
-
-```javascript
-Input: n = 8
-Expected Output: 92
-```
-
-### Test Case 9: n = 9
-
-```javascript
-Input: n = 9
-Expected Output: 352
-```
-
----
-
-## Validation / Type Checks
-
-### Test Case 10: Function returns a number
-
-```javascript
-Input: n = 4
-Expected Behavior: typeof result === "number", integer >= 0
-```
-
----
 
 ## Performance Test Cases
 
-### Test Case 11: Performance n = 8
-
+### Large Arrays
 ```javascript
-Input: n = 8
-Expected Behavior: Complete within 1000ms
+
+const largeArray1 = Array(5000).fill(2);  
+const largeArray2 = [5000].concat(Array(4999).fill(1));  
+const largeArray3 = Array(10000).fill(1);  
 ```
 
-### Test Case 12: Performance n = 9
-
+### Stress Tests
 ```javascript
-Input: n = 9
-Expected Behavior: Complete within 5000ms
+
+const alternating = [];
+for(let i = 0; i < 1000; i++) {
+    alternating.push(i % 2 === 0 ? 2 : 1);
+}
+
+const fib = [1, 1];
+for(let i = 2; i < 100; i++) {
+    fib.push(Math.min(fib[i-1] + fib[i-2], 1000));
+}
 ```
 
----
+## Validation Rules
 
-## Edge Cases & Consistency
+### Input Validation
+- Array length must be between 1 and 10,000
+- Each element must be between 0 and 1,000
+- Must be guaranteed reachable (per problem statement)
 
-### Test Case 13: Maximum constraint n = 9
+### Output Validation
+- Result must be a non-negative integer
+- Result must be the minimum possible jumps
+- For array of length n, maximum jumps is n-1
 
-```javascript
-Input: n = 9
-Expected Output: 352
-```
-
-### Test Case 14: Multiple calls consistency
-
-```javascript
-Input: n = 6
-Expected Behavior: Multiple calls return same result (4)
-```
-
-### Test Case 15: Boundary values
-
-```javascript
-Input: n = 1
-Expected Output: 1
-
-Input: n = 9
-Expected Output: 352
-```
-
-### Test Case 16: Known sequence validation
-
-```javascript
-Input: n = 1..9
-Expected Output: [1, 0, 0, 2, 10, 4, 40, 92, 352]
-```
-
----
-
-## Algorithm Behavior & Correctness
-
-### Test Case 17: Algorithm efficiency (not returning array)
-
-```javascript
-Input: n = 4
-Expected Behavior: Return a number, not an array
-```
-
-### Test Case 18: Verify algorithm correctness manually
-
-```javascript
-Input: n = 1
-Expected Output: 1
-
-Input: n = 2
-Expected Output: 0
-
-Input: n = 3
-Expected Output: 0
-
-Input: n = 4
-Expected Output: 2
-```
-
-```
-
-```
+### Algorithm Validation
+- Must run in O(n) time
+- Must use O(1) extra space
+- Must handle all edge cases correctly

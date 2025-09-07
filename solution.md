@@ -1,321 +1,241 @@
-# N-Queens Problem - Complete Solution
+# Jump Game II - Solution
 
 ## Algorithm Overview
 
-The N-Queens problem is solved using **backtracking**, a systematic method of trying all possible configurations while eliminating invalid paths early.
+The Jump Game II problem can be solved optimally using a **Greedy Algorithm** that tracks jump boundaries. The key insight is that we don't need to explore all possible paths - we can make optimal decisions at each step.
 
-### Core Strategy
-1. **Place queens row by row** (eliminates row conflicts automatically)
-2. **For each row, try each column position**
-3. **Check if placement is valid** (no column or diagonal conflicts)
-4. **If valid, recursively solve next row**
-5. **If invalid or no solution found, backtrack and try next position**
-6. **Collect all complete valid solutions**
+### Core Concept: Jump Boundaries
 
-## Complete Implementation
+Think of the problem in terms of "levels" or "boundaries":
+- **Level 0**: Starting position (index 0)
+- **Level 1**: All positions reachable with 1 jump
+- **Level 2**: All positions reachable with 2 jumps
+- And so on...
+
+We want to find the minimum level that contains the target index.
+
+## Detailed Algorithm
+
+### Greedy Approach - O(n) Solution
 
 ```javascript
-function solveNQueens(n) {
-    const result = [];
-    const board = Array(n).fill().map(() => Array(n).fill('.'));
+function jump(nums) {
+    const n = nums.length;
+    if (n <= 1) return 0;
 
-    function isValid(row, col) {
+    let jumps = 0;          
+    let currentEnd = 0;     
+    let farthest = 0;       
 
-        for (let i = 0; i < row; i++) {
-            if (board[i][col] === 'Q') return false;
-        }
+    for (let i = 0; i < n - 1; i++) {
 
-        for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
-            if (board[i][j] === 'Q') return false;
-        }
+        farthest = Math.max(farthest, i + nums[i]);
 
-        for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
-            if (board[i][j] === 'Q') return false;
-        }
+        if (i === currentEnd) {
+            jumps++;                    
+            currentEnd = farthest;      
 
-        return true;
-    }
-
-    function backtrack(row) {
-
-        if (row === n) {
-            result.push(board.map(row => row.join('')));
-            return;
-        }
-
-        for (let col = 0; col < n; col++) {
-            if (isValid(row, col)) {
-                board[row][col] = 'Q';      
-                backtrack(row + 1);         
-                board[row][col] = '.';      
+            if (currentEnd >= n - 1) {
+                break;
             }
         }
     }
 
-    backtrack(0);
-    return result;
+    return jumps;
 }
 ```
 
-## Step-by-Step Explanation
+### Step-by-Step Walkthrough
 
-### 1. Data Structure Setup
+**Example**: `nums = [2,3,1,1,4]`
+
+| i | nums[i] | farthest | i === currentEnd | jumps | currentEnd |
+|---|---------|----------|------------------|-------|------------|
+| 0 | 2       | 2        | Yes (0)          | 1     | 2          |
+| 1 | 3       | 4        | No               | 1     | 2          |
+| 2 | 1       | 4        | Yes (2)          | 2     | 4          |
+
+**Result**: 2 jumps
+
+**Detailed Steps**:
+1. **i=0**: From index 0, can reach up to index 2. Since i equals currentEnd (0), make jump 1. New boundary is index 2.
+2. **i=1**: From index 1, can reach up to index 4. Update farthest to 4, but don't jump yet.
+3. **i=2**: From index 2, can reach up to index 3. Since i equals currentEnd (2), make jump 2. New boundary is index 4.
+4. **i=3**: We can stop here since currentEnd (4) ≥ n-1 (4).
+
+## Alternative Approaches
+
+### 1. BFS Approach - O(n²) Solution
+
 ```javascript
-const result = [];  
-const board = Array(n).fill().map(() => Array(n).fill('.'));  
-```
-- `result`: Collects all valid complete solutions
-- `board`: 2D array representing current state, '.' for empty, 'Q' for queen
+function jumpBFS(nums) {
+    if (nums.length <= 1) return 0;
 
-### 2. Validation Function
-```javascript
-function isValid(row, col) {
+    const queue = [[0, 0]]; 
+    const visited = new Set([0]);
 
-```
+    while (queue.length > 0) {
+        const [index, jumps] = queue.shift();
 
-**Column Check**: Look up the column for any existing queens
-```javascript
-for (let i = 0; i < row; i++) {
-    if (board[i][col] === 'Q') return false;
-}
-```
+        for (let i = 1; i <= nums[index]; i++) {
+            const nextIndex = index + i;
 
-**Diagonal Checks**: Check both diagonal directions above current position
-```javascript
+            if (nextIndex === nums.length - 1) {
+                return jumps + 1;
+            }
 
-for (let i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
-    if (board[i][j] === 'Q') return false;
-}
-
-for (let i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
-    if (board[i][j] === 'Q') return false;
-}
-```
-
-### 3. Backtracking Logic
-```javascript
-function backtrack(row) {
-    if (row === n) {
-
-        result.push(board.map(row => row.join('')));
-        return;
-    }
-
-    for (let col = 0; col < n; col++) {
-        if (isValid(row, col)) {
-            board[row][col] = 'Q';      
-            backtrack(row + 1);         
-            board[row][col] = '.';      
+            if (nextIndex < nums.length && !visited.has(nextIndex)) {
+                visited.add(nextIndex);
+                queue.push([nextIndex, jumps + 1]);
+            }
         }
     }
+
+    return -1; 
 }
 ```
+
+**Complexity**: O(n²) time, O(n) space
+**Why not optimal**: Explores many unnecessary paths
+
+### 2. Dynamic Programming - O(n²) Solution
+
+```javascript
+function jumpDP(nums) {
+    const n = nums.length;
+    const dp = new Array(n).fill(Infinity);
+    dp[0] = 0;
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 1; j <= nums[i] && i + j < n; j++) {
+            dp[i + j] = Math.min(dp[i + j], dp[i] + 1);
+        }
+    }
+
+    return dp[n - 1];
+}
+```
+
+**Complexity**: O(n²) time, O(n) space
+**Why not optimal**: Recalculates overlapping subproblems unnecessarily
+
+## Why Greedy is Optimal
+
+### Proof of Correctness
+
+The greedy algorithm works because:
+
+1. **Optimal Substructure**: If we can reach index i in k jumps optimally, then we can reach any index j ≤ i in ≤ k jumps optimally.
+
+2. **Greedy Choice Property**: At each boundary, choosing the position that allows us to reach the farthest is always optimal. There's never a benefit to choosing a position that reaches less far.
+
+3. **No Backtracking Needed**: Once we determine the optimal number of jumps to reach a certain boundary, we never need to reconsider.
+
+### Mathematical Insight
+
+At each jump boundary, we have complete information about all reachable positions with the current number of jumps. The optimal strategy is always to extend our reach as far as possible, which the greedy approach does.
 
 ## Complexity Analysis
 
-### Time Complexity: O(N!)
-- **In worst case**: Try all possible positions
-- **First row**: N choices
-- **Second row**: ~(N-2) valid choices (avoid conflicts)  
-- **Third row**: ~(N-4) valid choices
-- **Total**: N × (N-2) × (N-4) × ... ≈ O(N!)
-- **In practice**: Much better due to early pruning
+### Time Complexity: O(n)
+- Single pass through the array
+- Each element is processed exactly once
+- No nested loops or recursive calls
 
-### Space Complexity: O(N²)
-- **Board storage**: O(N²)
-- **Recursion depth**: O(N) 
-- **Result storage**: O(N² × solutions) - not counted in algorithm complexity
+### Space Complexity: O(1)
+- Only using a constant number of variables
+- No additional data structures that grow with input size
 
-## Algorithm Walkthrough (n=4 example)
+## Edge Cases Handling
 
-```
-Initial board:        Try (0,0):           Invalid (0,1):
-. . . .              Q . . .              . Q . .
-. . . .              . . . .              . . . .  
-. . . .              . . . .              . . . .
-. . . .              . . . .              . . . .
-
-Try (0,1):           Try (1,3):           Try (2,1):           Invalid - attacks
-. Q . .              . Q . .              . Q . .              (0,1) and (2,1)
-. . . .              . . . Q              . Q . .              same column
-. . . .              . . . .              . . . .
-. . . .              . . . .              . . . .
-
-... backtrack and continue ...
-
-Final solution 1:     Final solution 2:
-. Q . .              . . Q .
-. . . Q              Q . . .  
-Q . . .              . . . Q
-. . Q .              . Q . .
-```
-
-## Optimized Variations
-
-### 1. Using Sets for O(1) Conflict Detection
+### Single Element Array
 ```javascript
-function solveNQueensOptimized(n) {
-    const result = [];
-    const cols = new Set();          
-    const diag1 = new Set();         
-    const diag2 = new Set();         
-    const board = Array(n).fill().map(() => Array(n).fill('.'));
+nums = [0] → return 0
+```
+Already at the target, no jumps needed.
 
-    function backtrack(row) {
-        if (row === n) {
-            result.push(board.map(row => row.join('')));
-            return;
-        }
+### Two Element Array
+```javascript
+nums = [1,0] → return 1
+nums = [2,1] → return 1
+```
+One jump is always needed and sufficient.
 
-        for (let col = 0; col < n; col++) {
-            const d1 = row - col;
-            const d2 = row + col;
+### Large Jump Values
+```javascript
+nums = [10,1,1,1,1] → return 1
+```
+Can jump directly to the end.
 
-            if (cols.has(col) || diag1.has(d1) || diag2.has(d2)) {
-                continue; 
-            }
+### All Minimum Jumps
+```javascript
+nums = [1,1,1,1] → return 3
+```
+Must make minimum possible jumps at each step.
 
-            board[row][col] = 'Q';
-            cols.add(col);
-            diag1.add(d1);
-            diag2.add(d2);
+## Common Pitfalls and How to Avoid Them
 
-            backtrack(row + 1);
+### Pitfall 1: Off-by-One Errors
+❌ **Wrong**: `for (let i = 0; i < n; i++)`
+✅ **Correct**: `for (let i = 0; i < n - 1; i++)`
 
-            board[row][col] = '.';
-            cols.delete(col);
-            diag1.delete(d1);
-            diag2.delete(d2);
-        }
-    }
+**Reason**: We don't need to jump from the last index.
 
-    backtrack(0);
-    return result;
+### Pitfall 2: Premature Jump Counting
+❌ **Wrong**: Increment jumps at every position
+✅ **Correct**: Increment jumps only when reaching a boundary
+
+### Pitfall 3: Not Tracking Farthest Correctly
+❌ **Wrong**: `farthest = i + nums[i]`
+✅ **Correct**: `farthest = Math.max(farthest, i + nums[i])`
+
+### Pitfall 4: Missing Early Termination
+Adding the early termination check improves performance:
+```javascript
+if (currentEnd >= n - 1) {
+    break;
 }
 ```
 
-### 2. Count-Only Version (Faster)
+## Optimization Tips
+
+### 1. Early Termination
+Stop as soon as we can reach the target:
 ```javascript
-function countNQueens(n) {
-    let count = 0;
-    const cols = new Set();
-    const diag1 = new Set();
-    const diag2 = new Set();
-
-    function backtrack(row) {
-        if (row === n) {
-            count++;
-            return;
-        }
-
-        for (let col = 0; col < n; col++) {
-            const d1 = row - col;
-            const d2 = row + col;
-
-            if (cols.has(col) || diag1.has(d1) || diag2.has(d2)) {
-                continue;
-            }
-
-            cols.add(col);
-            diag1.add(d1);
-            diag2.add(d2);
-
-            backtrack(row + 1);
-
-            cols.delete(col);
-            diag1.delete(d1);
-            diag2.delete(d2);
-        }
-    }
-
-    backtrack(0);
-    return count;
+if (currentEnd >= n - 1) {
+    break;
 }
 ```
 
-## Common Mistakes & Solutions
-
-### 1. Forgetting to Backtrack
+### 2. Input Validation
+Add bounds checking for interview scenarios:
 ```javascript
-
-board[row][col] = 'Q';
-backtrack(row + 1);
-
-board[row][col] = 'Q';
-backtrack(row + 1);  
-board[row][col] = '.';  
+if (nums.length <= 1) return 0;
+if (nums[0] === 0 && nums.length > 1) return -1; 
 ```
 
-### 2. Checking Unnecessary Positions
+### 3. Cleaner Variable Names
+Use descriptive names to avoid confusion:
 ```javascript
-
-function isValid(row, col) {
-    for (let i = 0; i < n; i++) {  
-        if (board[i][col] === 'Q') return false;
-    }
-}
-
-function isValid(row, col) {
-    for (let i = 0; i < row; i++) {  
-        if (board[i][col] === 'Q') return false;
-    }
-}
+let jumpsCount = 0;
+let currentBoundary = 0;
+let maxReachable = 0;
 ```
 
-### 3. Incorrect Solution Format
-```javascript
+## Interview Discussion Points
 
-result.push(board);  
+### Why Not BFS?
+- BFS would work but is O(n²) in worst case
+- Greedy is more elegant and efficient
+- Shows deeper algorithmic understanding
 
-result.push(board.map(row => row.join('')));
-```
+### Comparison to Jump Game I
+- Jump Game I: "Can you reach the end?" (Boolean)
+- Jump Game II: "What's the minimum jumps to reach the end?" (Integer)
+- Jump Game I can use similar greedy approach but simpler
 
-## Testing Strategy
-
-### Unit Tests
-```javascript
-describe('N-Queens Solutions', () => {
-    test('n=1 returns single solution', () => {
-        expect(solveNQueens(1)).toEqual([['Q']]);
-    });
-
-    test('n=4 returns exactly 2 solutions', () => {
-        const result = solveNQueens(4);
-        expect(result).toHaveLength(2);
-        expect(result).toContain(['.Q..', '...Q', 'Q...', '..Q.']);
-        expect(result).toContain(['..Q.', 'Q...', '...Q', '.Q..']);
-    });
-
-    test('no solution cases return empty array', () => {
-        expect(solveNQueens(2)).toEqual([]);
-        expect(solveNQueens(3)).toEqual([]);
-    });
-});
-```
-
-### Validation Tests
-```javascript
-function validateAllSolutions(n) {
-    const solutions = solveNQueens(n);
-
-    solutions.forEach(solution => {
-
-        expect(solution).toHaveLength(n);
-        solution.forEach(row => {
-            expect(row).toHaveLength(n);
-            expect(row.match(/Q/g)).toHaveLength(1);
-        });
-
-        const positions = solution.map((row, i) => [i, row.indexOf('Q')]);
-        for (let i = 0; i < positions.length; i++) {
-            for (let j = i + 1; j < positions.length; j++) {
-                const [r1, c1] = positions[i];
-                const [r2, c2] = positions[j];
-                expect(c1).not.toBe(c2);  
-                expect(Math.abs(r1-r2)).not.toBe(Math.abs(c1-c2));  
-            }
-        }
-    });
-}
-```
-
+### Real-world Applications
+- Shortest path problems with uniform costs
+- Game AI for platformer games
+- Network routing optimization
+- Resource allocation problems

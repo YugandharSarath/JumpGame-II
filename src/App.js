@@ -1,5 +1,13 @@
-import NQueens2App from "./Queen";
+import React from 'react';
+import JumpGame from './JumpGame';
+import './JumpGameII.css';
 
-export default function App() {
-  return <NQueens2App />;
+function App() {
+  return (
+    <div className="App">
+      <JumpGame />
+    </div>
+  );
 }
+
+export default App;

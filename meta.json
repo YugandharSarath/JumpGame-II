@@ -1,31 +1,95 @@
 {
-  "problem": "N-Queens II",
-  "difficulty": "Hard",
-  "category": "Backtracking",
-  "tags": ["Backtracking", "Recursion", "Optimization", "Math"],
-  "companiesAsked": ["Amazon", "Adobe", "Apple", "Google", "Microsoft", "Facebook/Meta", "Uber", "ByteDance", "LinkedIn"],
-  "expectedDuration": "30-45 minutes",
-  "timeComplexity": "O(N!)",
-  "spaceComplexity": "O(N)",
-  "leetcodeNumber": 52,
-  "optimizations": [
-    "Set-based conflict detection",
-    "Bitwise operations",
-    "Memory-efficient counting",
-    "No solution storage required"
+  "problemId": "45",
+  "title": "Jump Game II",
+  "difficulty": "Medium",
+  "duration": "25-35 minutes",
+  "companies": [
+    "Amazon",
+    "Microsoft",
+    "Google",
+    "Facebook/Meta",
+    "Apple",
+    "Bloomberg",
+    "Adobe",
+    "Uber",
+    "LinkedIn",
+    "Twitter",
+    "Netflix",
+    "Salesforce",
+    "Goldman Sachs",
+    "JPMorgan",
+    "Citadel"
   ],
-  "keyDifferences": {
-    "fromNQueensI": "Returns count instead of all solutions, more memory efficient"
+  "topicTags": ["Array", "Dynamic Programming", "Greedy"],
+  "similarProblems": [
+    {
+      "id": "55",
+      "title": "Jump Game",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "1306",
+      "title": "Jump Game III",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "1345",
+      "title": "Jump Game IV",
+      "difficulty": "Hard"
+    },
+    {
+      "id": "1696",
+      "title": "Jump Game VI",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "1871",
+      "title": "Jump Game VII",
+      "difficulty": "Medium"
+    }
+  ],
+  "complexity": {
+    "timeComplexity": "O(n)",
+    "spaceComplexity": "O(1)",
+    "approach": "Greedy"
   },
-  "expectedCounts": {
-    "1": 1,
-    "2": 0,
-    "3": 0,
-    "4": 2,
-    "5": 10,
-    "6": 4,
-    "7": 40,
-    "8": 92,
-    "9": 352
-  }
+  "constraints": {
+    "arrayLength": {
+      "min": 1,
+      "max": 10000
+    },
+    "elementValue": {
+      "min": 0,
+      "max": 1000
+    },
+    "guaranteed": "Can always reach the last index"
+  },
+  "keyInsights": [
+    "Greedy approach is optimal",
+    "Think in terms of jump boundaries",
+    "Track farthest reachable position",
+    "Only increment jumps when crossing boundaries"
+  ],
+  "interviewFrequency": {
+    "overall": "Very High",
+    "byCompany": {
+      "FAANG": "Very High",
+      "BigTech": "High",
+      "Startups": "Medium",
+      "Finance": "High"
+    }
+  },
+  "skillLevel": {
+    "algorithmDesign": "Medium",
+    "implementation": "Easy",
+    "optimization": "Medium",
+    "edgeCases": "Easy"
+  },
+  "commonMistakes": [
+    "Using BFS/DFS instead of greedy",
+    "Off-by-one errors in loop bounds",
+    "Incrementing jumps at wrong positions",
+    "Not handling single/two element arrays",
+    "Confusing with Jump Game I problem"
+  ]
 }

@@ -1,45 +1,52 @@
-# N-Queens II Problem 
 
-## Problem
+---
 
-Count the number of distinct solutions to place `n` queens on an `n × n` chessboard so that no two queens attack each other (no same row, column, or diagonal).
+# Jump Game II
+
+## Problem Statement
+
+You are given a **0-indexed** array `nums` of length `n`. You start at index `0`.
+Each element `nums[i]` represents the maximum jump length from that index.
+
+Your task is to return the **minimum number of jumps** required to reach index `n - 1`.
+It is guaranteed that you can always reach the last index.
+
+---
 
 ## Requirements
 
-* **Input**: Integer `n` (1 ≤ n ≤ 9)
-* **Output**: `Integer` — count of all distinct valid solutions
-* Return only the count, not the actual solutions
-* Must count **all unique solutions**
-* Use optimized backtracking for efficiency
-* Handle n ≤ 9 quickly with reasonable memory usage
+* Calculate minimum jumps to reach the end.
+* Handle arrays of length `1` to `10,000` with values `0` to `1000`.
+* Must run in **O(n)** time and **O(1)** extra space.
+* UI must be responsive and allow interactive step-by-step visualization.
 
+---
 
 ## Edge Cases & Constraints
 
-* n = 1 → `1` (one solution)
-* n = 2 or 3 → `0` (no solutions)
-* n < 1 or n > 9 → return `0` or show error
-* Must count **all unique solutions** efficiently
-* Expected counts for validation:
-  - n=4: 2 solutions
-  - n=5: 10 solutions  
-  - n=6: 4 solutions
-  - n=7: 40 solutions
-  - n=8: 92 solutions
-  - n=9: 352 solutions
+* **Edge Cases:**
 
-## Data-Tests
+  * `[0]` → Output `0` (already at end)
+  * `[1,0]` → Output `1`
+  * `[5,1,1,1,1,1]` → Output `1` (single big jump)
+  * `[1,1,1,1,1]` → Output `4` (minimum jumps one by one)
+  * `[2,0,0,1,4]` → Must jump over zeros successfully
+* **Constraints:**
 
-* `data-testid="n-input"` → Board size input
-* `data-testid="solve-button"` → Count trigger
-* `data-testid="solution-count"` → Total solution count display
-* `data-testid="chess-board"` → Optional board visualization (empty reference board)
+  * `1 ≤ nums.length ≤ 10^4`
+  * `0 ≤ nums[i] ≤ 1000`
+  * Always possible to reach `nums[n - 1]`
+  * Must stay efficient even for 10,000 elements
+  * Handle invalid input gracefully (empty, negative, non-numeric)
 
+---
 
-## Key Differences from N-Queens I
+## Data Test IDs
 
-* **N-Queens I**: Returns `Array<Array<string>>` with all solutions
-* **N-Queens II**: Returns `number` with count only
-* **Optimization**: Can avoid storing board states and solution arrays
-* **Memory**: Much more memory efficient for large n
-* **Performance**: Faster since no string/array construction needed
+* **Main Container:** `jump-game-container`
+* **Input Section:** `array-input`, `calculate-btn`, `example1-btn`, `example2-btn`, `error-message`
+* **Visualization Section:** `array-visualization`, `array-element-{index}`, `visualize-btn`, `reset-btn`
+* **Results Section:** `result-section`, `result-value`, `step-{index}`
+
+---
+
